@@ -1,6 +1,12 @@
 from datetime import date
 
-from progressbar.widgets import (
+from .utils import (
+    len_color,
+    streams
+)
+from .shortcuts import progressbar
+
+from .widgets import (
     Timer,
     ETA,
     AdaptiveETA,
@@ -17,8 +23,13 @@ from progressbar.widgets import (
     ReverseBar,
     BouncingBar,
     RotatingMarker,
+    VariableMixin,
+    MultiRangeBar,
+    MultiProgressBar,
+    Variable,
     DynamicMessage,
-    FormatCustomText
+    FormatCustomText,
+    CurrentTime
 )
 
 from .bar import (
@@ -36,6 +47,9 @@ from .__about__ import (
 
 __date__ = str(date.today())
 __all__ = [
+    'progressbar',
+    'len_color',
+    'streams',
     'Timer',
     'ETA',
     'AdaptiveETA',
@@ -55,8 +69,13 @@ __all__ = [
     'ProgressBar',
     'DataTransferBar',
     'RotatingMarker',
+    'VariableMixin',
+    'MultiRangeBar',
+    'MultiProgressBar',
+    'Variable',
     'DynamicMessage',
     'FormatCustomText',
+    'CurrentTime',
     'NullBar',
     '__author__',
     '__version__',
