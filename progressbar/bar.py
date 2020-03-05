@@ -113,6 +113,11 @@ class DefaultFdMixin(ProgressBarMixinBase):
 
         self.fd.flush()
 
+    def start(self, *args, **kwargs):
+        with self.fd._lock:
+            self._row = self.fd.y
+            self.fd.write('\n')
+
 
 class ResizableMixin(ProgressBarMixinBase):
 
@@ -692,10 +697,6 @@ class ProgressBar(StdRedirectMixin, ResizableMixin, ProgressBarBase):
         # Prevent multiple starts
         if self.start_time is not None:  # pragma: no cover
             return self
-
-        with self.fd._lock:
-            self._row = self.fd.y
-            self.fd.write('\n')
 
         if max_value is not None:
             self.max_value = max_value
