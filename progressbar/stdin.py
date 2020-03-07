@@ -4,6 +4,8 @@ from __future__ import print_function
 import sys
 import os
 
+read_started = False
+
 try:
     # Windows
     import msvcrt
@@ -30,8 +32,12 @@ except ImportError:
     old_term = termios.tcgetattr(sys.stdin)
 
     def end_read():
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_term)
-        atexit.unregister(end_read)
+        global read_started
+
+        if read_started:
+            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_term)
+
+        read_started = False
 
     def _getch():
         return os.read(sys.stdin.fileno(), 1)
@@ -49,8 +55,13 @@ except ImportError:
         new_term[6][termios.VTIME] = 0
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, new_term)
 
+        global read_started
+
+        read_started = True
         # Support normal-terminal reset at exit
-        atexit.register(end_read)
+
+
+atexit.register(end_read)
 
 
 def read():
@@ -64,7 +75,7 @@ def read():
         while key is not None and len(key) > 0:
             data += key
             key = _getch()
-    
+
     return data
 
 
