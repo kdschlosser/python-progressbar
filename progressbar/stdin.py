@@ -3,6 +3,8 @@
 from __future__ import print_function
 import sys
 import os
+import atexit
+
 
 read_started = False
 
@@ -25,8 +27,6 @@ try:
 except ImportError:
     # Posix (Linux, OS X)
     import termios
-    import atexit
-    from select import select
 
     # Save the terminal settings
     old_term = termios.tcgetattr(sys.stdin)
