@@ -43,8 +43,7 @@ except ImportError:
         return os.read(sys.stdin.fileno(), 1)
 
     def _kbhit():
-        dr, dw, de = select([sys.stdin], [], [], 0)
-        return dr != []
+        pass
 
     def start_read():
         new_term = termios.tcgetattr(sys.stdin)
@@ -57,8 +56,8 @@ except ImportError:
 
         global read_started
 
-        read_started = True
         # Support normal-terminal reset at exit
+        read_started = True
 
 
 atexit.register(end_read)
@@ -85,7 +84,7 @@ if __name__ == "__main__":
     import time
     print('Testing for ANSI escape return value for cursor position.')
     print('sending ANSI code ' + repr('\x1B[6n'))
-    print('Hit any key, or ESC to exit')
+    print('press Spacebar to exit')
 
     start_read()
     sys.stdout.write('\x1B[6n')
@@ -94,7 +93,7 @@ if __name__ == "__main__":
     while True:
         in_data = read()
         if in_data:
-            if len(in_data) == 1 and ord(in_data) == 27:  # ESC
+            if len(in_data) == 1 and ord(in_data) == 32:  # Space
                 break
 
             print(repr(in_data))
