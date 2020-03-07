@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 import sys
+import os
 
 try:
     # Windows
@@ -25,29 +26,28 @@ except ImportError:
     import atexit
     from select import select
 
-    fd = sys.stdin.fileno()
-
     # Save the terminal settings
-    old_term = termios.tcgetattr(fd)
+    old_term = termios.tcgetattr(sys.stdin)
 
     def end_read():
-        termios.tcsetattr(fd, termios.TCSAFLUSH, old_term)
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_term)
         atexit.unregister(end_read)
 
     def _getch():
-        return sys.stdin.read(1)
+        return os.read(sys.stdin.fileno(), 1)
 
     def _kbhit():
         dr, dw, de = select([sys.stdin], [], [], 0)
         return dr != []
 
-
     def start_read():
-        new_term = termios.tcgetattr(fd)
+        new_term = termios.tcgetattr(sys.stdin)
 
         # New terminal setting unbuffered
         new_term[3] = (new_term[3] & ~termios.ICANON & ~termios.ECHO)
-        termios.tcsetattr(fd, termios.TCSAFLUSH, new_term)
+        new_term[6][termios.VMIN] = 0
+        new_term[6][termios.VTIME] = 0
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, new_term)
 
         # Support normal-terminal reset at exit
         atexit.register(end_read)
@@ -56,9 +56,15 @@ except ImportError:
 def read():
     data = ''
 
-    while _kbhit():
-        data += _getch()
-
+    if sys.platform.startswith('win'):
+        while _kbhit():
+            data += _getch()
+    else:
+        key = _getch()
+        while key is not None and len(key) > 0:
+            data += key
+            key = _getch()
+    
     return data
 
 
